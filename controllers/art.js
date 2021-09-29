@@ -1,20 +1,18 @@
 const db = require("../models");
 const isAuth = require("../utils/isAuth");
-
+const checkParams = require("../utils/checkParams");
 const { Work, Art } = db;
 
 const artController = {
-  async getArt(req, res) {
-    const { id: WorkId } = req.params;
-    console.log(WorkId);
+  async getArts(req, res) {
+    const { id } = req.params;
     try {
       const art = await Art.findAll({
         where: {
-          WorkId,
+          id,
         },
       });
-      console.log(art);
-      res.send(art);
+      res.json({ ok: 1, art });
     } catch (err) {
       res.send(err);
     }

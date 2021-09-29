@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Comic.init(
     {
-      location: DataTypes.ARRAY(DataTypes.STRING),
+      location: DataTypes.ARRAY(DataTypes.DECIMAL),
       WorkId: DataTypes.INTEGER,
     },
     {

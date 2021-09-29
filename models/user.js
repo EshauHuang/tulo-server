@@ -16,10 +16,6 @@ module.exports = (sequelize, DataTypes) => {
       nickname: DataTypes.STRING,
       username: DataTypes.STRING,
       password: DataTypes.STRING,
-      authority: {
-        type: DataTypes.ENUM("ADMIN", "NORMAL", "BANNED"),
-        defaultValue: "NORMAL",
-      },
     },
     {
       sequelize,

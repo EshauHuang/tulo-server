@@ -1,4 +1,6 @@
 const bcrypt = require("bcrypt");
+const { singular } = require("pluralize");
+
 const db = require("../models");
 const isAuth = require("../utils/isAuth");
 const { createAccessToken, setAccessToken } = require("../utils/tokens");
@@ -10,6 +12,7 @@ const userController = {
   async signup(req, res) {
     const { username, password, nickname } = req.body;
     try {
+      if (!username || !password || !nickname) throw new Error("INVALID");
       const user = await User.findOne({
         where: {
           username,
@@ -32,8 +35,8 @@ const userController = {
   },
   async signin(req, res) {
     const { username, password } = req.body;
-    if (!username || !password) throw new Error("INVALID");
     try {
+      if (!username || !password) throw new Error("INVALID");
       const user = await User.findOne({
         where: {
           username,
@@ -42,7 +45,7 @@ const userController = {
       if (!user) throw new Error("INVALID");
       const valid = await bcrypt.compare(password, user.password);
       if (!valid) throw new Error("INVALID");
-      const accessToken = createAccessToken(user.id);
+      const accessToken = createAccessToken(user);
       setAccessToken(req, res, accessToken);
       res.json({ ok: 1, message: "SIGN IN" });
     } catch (err) {
@@ -53,20 +56,35 @@ const userController = {
     res.clearCookie("accessToken");
     res.json({ ok: 1, message: "SIGN OUT" });
   },
-  async getUsers(req, res) {
-    const { id } = req.params;
-    const { auth } = req.body;
+  async getMe(req, res) {
     try {
-      if (auth !== process.env.AUTH) throw new Error("UNAUTHORIZED");
-      const user = await User.findOne({
+      const user = await isAuth(req);
+      res.json({ ok: 1, user });
+    } catch (err) {
+      res.json({ ok: 0, message: err.message });
+    }
+  },
+  async getUser(req, res) {
+    const { id } = req.params;
+    try {
+      const user = await User.findAll({
         where: {
           id,
         },
-        attributes: ["username", "nickname", "createdAt"],
+        attributes: ["id", "username", "nickname", "createdAt"],
+      });
+      res.json({ ok: 1, user });
+    } catch (err) {
+      res.json({ ok: 0, message: err.message });
+    }
+  },
+  async getUsers(req, res) {
+    try {
+      const user = await User.findAll({
+        attributes: ["id", "username", "nickname", "createdAt"],
         include: [
           {
             model: Work,
-            include: [Comic, Art],
           },
         ],
       });
@@ -75,9 +93,13 @@ const userController = {
       res.json({ ok: 0, message: err.message });
     }
   },
-  async getMe(req, res) {
+  async getUserToWorks(req, res) {
+    const options = getMoreSources(req);
     try {
-      const user = await isAuth(req);
+      const user = await User.findAll({
+        attributes: ["username", "nickname", "createdAt"],
+        ...options,
+      });
       res.json({ ok: 1, user });
     } catch (err) {
       res.json({ ok: 0, message: err.message });
@@ -87,6 +109,28 @@ const userController = {
 
 module.exports = userController;
 
-function controlOrder(...query) {
-  console.log(...query);
+function getMoreSources(req) {
+  const { query } = req;
+  const models = {
+    art: Art,
+    comic: Comic,
+  };
+  let { source, id } = req.params;
+  let options = { include: {}, where: { id } };
+  // Object.keys(query).map((key) => {});
+  // sort, start, end, page, limit, desc,
+  if (!source) return;
+  source = source.toLowerCase();
+  source = singular(source);
+  if (models[source]) {
+    const model = models[source];
+    options.order = [[{ model: Work }, query.sort, query.order]];
+    options.include.model = Work;
+    // options.include.limit = 1;
+    options.include.where = { type: source };
+    options.include.include = { model };
+  }
+  console.log(options);
+
+  return options;
 }
