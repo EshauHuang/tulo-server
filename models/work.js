@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
       tag: DataTypes.STRING,
       UserId: DataTypes.STRING,
       type: {
-        type: DataTypes.ENUM("ART", "COMIC"),
+        type: DataTypes.ENUM("art", "comic"),
       },
     },
     {
