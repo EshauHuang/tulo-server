@@ -1,15 +1,12 @@
-const express = require('express')
-const router = express.Router()
+const express = require("express");
+const router = express.Router();
 const workController = require("../controllers/work");
 
 router.use((req, res, next) => {
-  console.log(req.url, "@", Date.now())
-  next()
-})
+  console.log(`${req.method} /works${req.url}`);
+  next();
+});
 
-router
-  .post('/', workController.newWork)
-  
+router.post("/", workController.newWork);
 
-
-module.exports = router
+module.exports = router;
