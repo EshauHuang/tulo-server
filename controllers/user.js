@@ -1,8 +1,8 @@
 const bcrypt = require("bcrypt");
-const { singular } = require("pluralize");
 
 const db = require("../models");
 const isAuth = require("../utils/isAuth");
+const setOptions = require("../utils/setOptions");
 const { createAccessToken, setAccessToken } = require("../utils/tokens");
 
 const { User, Work, Art, Comic } = db;
@@ -93,8 +93,11 @@ const userController = {
       res.json({ ok: 0, message: err.message });
     }
   },
-  async getUserToWorks(req, res) {
-    const options = getMoreSources(req);
+  async getExtended(req, res) {
+    const options = setOptions(req, Work, {
+      art: Art,
+      comic: Comic,
+    });
     try {
       const user = await User.findAll({
         attributes: ["username", "nickname", "createdAt"],
@@ -108,29 +111,3 @@ const userController = {
 };
 
 module.exports = userController;
-
-function getMoreSources(req) {
-  const { query } = req;
-  const models = {
-    art: Art,
-    comic: Comic,
-  };
-  let { source, id } = req.params;
-  let options = { include: {}, where: { id } };
-  // Object.keys(query).map((key) => {});
-  // sort, start, end, page, limit, desc,
-  if (!source) return;
-  source = source.toLowerCase();
-  source = singular(source);
-  if (models[source]) {
-    const model = models[source];
-    options.order = [[{ model: Work }, query.sort, query.order]];
-    options.include.model = Work;
-    // options.include.limit = 1;
-    options.include.where = { type: source };
-    options.include.include = { model };
-  }
-  console.log(options);
-
-  return options;
-}

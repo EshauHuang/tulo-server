@@ -1,6 +1,5 @@
 const db = require("../models");
 const isAuth = require("../utils/isAuth");
-const checkParams = require("../utils/checkParams");
 const { Work, Art } = db;
 
 const artController = {

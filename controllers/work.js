@@ -6,6 +6,8 @@ const { Work, Art, Comic } = db;
 const workController = {
   async newWork(req, res) {
     const { type, title } = req.body;
+    console.log(req.file);
+    console.log(type, title);
     try {
       if (!type || !title) throw new Error("FAIL");
       const me = await isAuth(req);
@@ -15,8 +17,9 @@ const workController = {
         attributes: ["title", "type", "tag", "UserId", "createdAt"],
         fields: ["title", "type", "tag", "UserId"],
       });
+      console.log(work);
       if (type.toLowerCase() === "art") {
-        result = await Art.create({
+        await Art.create({
           location: ["aaaaa", 2, 3, 4],
           WorkId: work.id,
           attributes: ["location", "workId", "createAt"],
@@ -24,7 +27,7 @@ const workController = {
         });
       }
       if (type.toLowerCase() === "comic") {
-        result = await Comic.create({
+        await Comic.create({
           location: ["1aaa", 2, 3, 4],
           WorkId: work.id,
           fields: ["location", "workId"],
