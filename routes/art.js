@@ -7,6 +7,6 @@ router.use((req, res, next) => {
   next();
 });
 
-router.get("/", artController.getArts).get("/:id", artController.getArts);
+router.get("/", artController.getArts).get("/:id", artController.getArt);
 
 module.exports = router;

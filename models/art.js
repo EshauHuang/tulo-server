@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Art.init(
     {
-      location: DataTypes.ARRAY(DataTypes.DECIMAL),
+      directory: DataTypes.STRING,
       WorkId: DataTypes.INTEGER,
     },
     {
