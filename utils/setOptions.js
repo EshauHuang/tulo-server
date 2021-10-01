@@ -22,7 +22,6 @@ const setAttrs = (attrs = "") => {
 
 const selectElement = (req) => {
   if (!req) return {};
-  let elements = {};
   const { query } = req;
   return Object.keys(query).reduce((obj, key) => {
     if (query[key]) {
@@ -47,7 +46,7 @@ const setOptions = (req, parentsModel, childrenModels) => {
   delete req.query.offset;
   delete req.query.attrs;
 
-  return {
+  console.log({
     include: [
       {
         model: parentsModel,
@@ -61,7 +60,27 @@ const setOptions = (req, parentsModel, childrenModels) => {
             }
           : {}),
         ...setPage(page, limit, offset),
+      },
+    ],
+    where: [{ id }],
+    ...setOrder(sort, order, parentsModel),
+  });
+
+  return {
+    include: [
+      {
+        model: parentsModel,
+        where: [{ type: source, ...selectElement(req) }],
+        ...(sourceModel
+          ? {
+              include: {
+                model: sourceModel,
+                ...setAttrs(attrs),
+              },
+            }
+          : {}),
         ...setOrder(sort, order),
+        ...setPage(page, limit, offset),
       },
     ],
     where: [{ id }],

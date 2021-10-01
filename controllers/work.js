@@ -1,43 +1,58 @@
 const db = require("../models");
 const isAuth = require("../utils/isAuth");
+const fs = require("fs");
 
-const { Work, Art, Comic } = db;
+const { Work, Art, Comic, sequelize } = db;
 
 const workController = {
   async newWork(req, res) {
-    const { type, title } = req.body;
-    console.log(req.file);
-    console.log(type, title);
+    const { files } = req;
+    const { title, type, tag } = req.body;
+    const { UserId } = await isAuth(req);
+    const directory = files[0].destination;
     try {
       if (!type || !title) throw new Error("FAIL");
-      const me = await isAuth(req);
-      const work = await Work.create({
-        ...req.body,
-        ...me,
-        attributes: ["title", "type", "tag", "UserId", "createdAt"],
-        fields: ["title", "type", "tag", "UserId"],
+      await sequelize.transaction(async (t) => {
+        const work = await Work.create(
+          {
+            title,
+            type,
+            tag,
+            UserId,
+          },
+          { transaction: t }
+        );
+
+        if (type.toLowerCase() === "art") {
+          await Art.create(
+            {
+              directory,
+              WorkId: work.id,
+            },
+            { transaction: t }
+          );
+        }
+        if (type.toLowerCase() === "comic") {
+          await Comic.create(
+            {
+              directory,
+              WorkId: work.id,
+            },
+            { transaction: t }
+          );
+        }
+        return work;
       });
-      console.log(work);
-      if (type.toLowerCase() === "art") {
-        await Art.create({
-          location: ["aaaaa", 2, 3, 4],
-          WorkId: work.id,
-          attributes: ["location", "workId", "createAt"],
-          fields: ["location", "workId"],
-        });
-      }
-      if (type.toLowerCase() === "comic") {
-        await Comic.create({
-          location: ["1aaa", 2, 3, 4],
-          WorkId: work.id,
-          fields: ["location", "workId"],
-        });
-      }
       res.json({ ok: 1, message: "Create Work" });
     } catch (err) {
+      fs.rmdir(directory, { recursive: true }, () => {
+        console.log("delete files");
+      });
       res.json({ ok: 0, message: err.message });
     }
   },
+
+  async getWorks(req, res) {},
 };
 
 module.exports = workController;
