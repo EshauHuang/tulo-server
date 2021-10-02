@@ -9,22 +9,24 @@ const work = require("./routes/work");
 const image = require("./routes/image");
 const multer = require("multer");
 const fs = require("fs");
-const path = require("path");
-const { directoryInit, indexInit } = require("./utils/generate");
+const { directoryInit, indexInit } = require("./utils/generators");
 let indexIncreased = indexInit();
-let generateDirectory = directoryInit();
+let directoryGenerator = directoryInit();
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = `./uploads${generateDirectory()}`;
-    console.log("dir", dir);
+    const { type } = req.body;
+    const dir = `./public/${type}${directoryGenerator()}`;
+
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
     cb(null, dir);
   },
   filename: (req, file, cb) => {
-    cb(null, `${indexIncreased()}.jpg`);
+    const extname = ".jpg";
+
+    cb(null, `${indexIncreased()}${extname}`);
   },
 });
 
@@ -50,11 +52,10 @@ server.use(cookie());
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 
-// server.use(express.static(__dirname + "/uploads/2021-9/D1"));
-server.use("/", image);
+server.use("/img", image);
 server.use("/users", user);
 server.use("/arts", art);
-server.use("/works", closureFuncInit, upload.array("avatar", 5), work);
+server.use("/works", generatorInit, upload.array("avatar", 5), work);
 
 server.get("/signout", userController.signout);
 server.post("/me", userController.getMe);
@@ -65,7 +66,7 @@ server.listen(process.env.PORT, () => {
   console.log(`Listening port ${process.env.PORT}`);
 });
 
-function closureFuncInit(req, res, next) {
+function generatorInit(req, res, next) {
   indexIncreased = indexInit();
   generateDirectory = directoryInit();
   next();
