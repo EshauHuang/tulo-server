@@ -9,7 +9,7 @@ const workController = {
     const { files } = req;
     const { title, type, tag } = req.body;
     const { UserId } = await isAuth(req);
-    const directory = files[0].destination;
+    const [, directory] = files[0].destination.match(/\.\/.*?(\/.*)/);
     try {
       if (!type || !title) throw new Error("FAIL");
       await sequelize.transaction(async (t) => {
@@ -45,7 +45,7 @@ const workController = {
       });
       res.json({ ok: 1, message: "Create Work" });
     } catch (err) {
-      fs.rmdir(directory, { recursive: true }, () => {
+      fs.rmdir(`.${directory}`, { recursive: true }, () => {
         console.log("delete files");
       });
       res.json({ ok: 0, message: err.message });

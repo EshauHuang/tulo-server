@@ -46,26 +46,6 @@ const setOptions = (req, parentsModel, childrenModels) => {
   delete req.query.offset;
   delete req.query.attrs;
 
-  console.log({
-    include: [
-      {
-        model: parentsModel,
-        where: [{ type: source, ...selectElement(req) }],
-        ...(sourceModel
-          ? {
-              include: {
-                model: sourceModel,
-                ...setAttrs(attrs),
-              },
-            }
-          : {}),
-        ...setPage(page, limit, offset),
-      },
-    ],
-    where: [{ id }],
-    ...setOrder(sort, order, parentsModel),
-  });
-
   return {
     include: [
       {
