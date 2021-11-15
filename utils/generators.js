@@ -10,7 +10,8 @@ const generateRandomString = () => {
 
 const directoryInit = (date = new Date()) => {
   const year = date.getFullYear();
-  const month = date.getMonth() < 10 ? `0${date.getMonth()}` : date.getMonth();
+  const month =
+    date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
   const day = date.getDate();
   const randomString = generateRandomString();
   return () => `/${year}/${month}/${day}/${randomString}`;

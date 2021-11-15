@@ -1,19 +1,15 @@
 const { sign } = require("jsonwebtoken");
 
 const createAccessToken = (user) => {
-  const { id: UserId, username, nickname, createdAt } = user;
-  return sign(
-    { UserId, username, nickname, createdAt },
-    process.env.ACCESS_TOKEN_SECRET,
-    {
-      expiresIn: "7d",
-    }
-  );
+  const { id: UserId, username, nickname } = user;
+  return sign({ UserId, username, nickname }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "7d",
+  });
 };
 
 const setAccessToken = (req, res, accessToken) => {
   return res.cookie("accessToken", accessToken, {
-    httpOnly: true,
+    maxAge: 60 * 60 * 24 * 1000 * 7,
   });
 };
 

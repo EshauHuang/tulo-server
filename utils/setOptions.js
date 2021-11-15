@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { singular } = require("pluralize");
+const { singular, plural } = require("pluralize");
 
 const setOrder = (sort = "id", order = "asc") => {
   let result = [];
@@ -8,13 +8,16 @@ const setOrder = (sort = "id", order = "asc") => {
   return { order: [result] };
 };
 
-const setPage = (page = 1, limit = 10, offset = 0) => ({
-  limit: parseInt(limit, 10),
-  offset: page ? (parseInt(page, 10) - 1) * parseInt(limit, 10) : offset,
-});
+const setPage = (page, limit, offset) => {
+  if (!page && !limit && !offset) return {};
+  return {
+    limit: parseInt(limit, 10),
+    offset: page ? (parseInt(page, 10) - 1) * parseInt(limit, 10) : offset,
+  };
+};
 
-const setAttrs = (attrs = "") => {
-  if (attrs === "") return {};
+const setAttrs = (attrs) => {
+  if (!attrs) return {};
   return {
     attributes: attrs.split(","),
   };
@@ -24,39 +27,48 @@ const selectElement = (req) => {
   if (!req) return {};
   const { query } = req;
   return Object.keys(query).reduce((obj, key) => {
-    if (query[key]) {
-      obj[key] = {
-        [Op.regexp]: `.*(${query[key]})+.*`,
-      };
-    }
+    if (!query[key]) return obj;
+    obj[key] = {
+      [Op.regexp]: `.*(${query[key]})+.*`,
+    };
     return obj;
   }, {});
 };
 
-const setOptions = (req, parentsModel, childrenModels) => {
-  const source = singular(req.params.source.toLowerCase());
-  const sourceModel = childrenModels[source];
-  const { id } = req.params;
-  const { sort, order, page, limit, offset, attrs } = req.query;
+const setType = (type) => {
+  if (!type) return {};
+  if (type === "all") return {};
+  return { type };
+};
 
+const setOptions = (req, { parentsModel, childrenModels }) => {
+  const { sort, order, page, limit, offset, attrs, type } = req.query;
+  const { id } = req.params;
+  const source = singular(req.params.source.toLowerCase());
+  const extendedModels = childrenModels[type];
+
+  if (!extendedModels && source !== "work") return;
+  delete req.query.type;
   delete req.query.sort;
   delete req.query.order;
   delete req.query.page;
   delete req.query.limit;
   delete req.query.offset;
   delete req.query.attrs;
-
   return {
     include: [
       {
         model: parentsModel,
-        where: [{ type: source, ...selectElement(req) }],
-        ...(sourceModel
+        as: plural(source),
+        where: extendedModels
+          ? [{ ...setType(type), ...selectElement(req) }]
+          : [{ ...selectElement(req) }],
+        ...(extendedModels
           ? {
-              include: {
-                model: sourceModel,
+              include: extendedModels.map((model) => ({
+                model,
                 ...setAttrs(attrs),
-              },
+              })),
             }
           : {}),
         ...setOrder(sort, order),
@@ -67,4 +79,11 @@ const setOptions = (req, parentsModel, childrenModels) => {
   };
 };
 
-module.exports = setOptions;
+module.exports = {
+  setOptions,
+  setOrder,
+  setPage,
+  setAttrs,
+  setType,
+  selectElement,
+};
