@@ -10,6 +10,7 @@ router.use((req, res, next) => {
 router
   .get("/", userController.getUsers)
   .get("/:id/", userController.getUser)
-  .get("/:id/:source", userController.getExtended);
+  .get("/:id/:source", userController.getExtended)
+  .put("/", userController.edit);
 
 module.exports = router;

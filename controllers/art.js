@@ -1,6 +1,5 @@
 const db = require("../models");
-const isAuth = require("../utils/isAuth");
-const { Work, Art } = db;
+const { Art } = db;
 
 const artController = {
   async getArt(req, res) {
@@ -8,9 +7,10 @@ const artController = {
     try {
       const art = await Art.findOne({
         where: {
-          id,
+          WorkId: id,
         },
       });
+      if (!art) throw new Error("Not fount");
       res.json({ ok: 1, art });
     } catch (err) {
       res.json({ ok: 0, message: err.message });
@@ -18,8 +18,9 @@ const artController = {
   },
   async getArts(req, res) {
     try {
-      const art = await Art.findAll();
-      res.json({ ok: 1, art });
+      const arts = await Art.findAll();
+      if (!arts) throw new Error("Not fount");
+      res.json({ ok: 1, arts });
     } catch (err) {
       res.json({ ok: 0, message: err.message });
     }

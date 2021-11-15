@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       title: DataTypes.STRING,
       tag: DataTypes.STRING,
+      intro: DataTypes.TEXT,
       UserId: DataTypes.STRING,
       type: {
         type: DataTypes.ENUM("art", "comic"),

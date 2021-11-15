@@ -7,6 +7,9 @@ router.use((req, res, next) => {
   next();
 });
 
-router.post("/", workController.newWork);
+router
+  .post("/", workController.newWork)
+  .get("/", workController.getWorks)
+  .get("/:id", workController.getWork);
 
 module.exports = router;
