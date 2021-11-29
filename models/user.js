@@ -17,7 +17,10 @@ module.exports = (sequelize, DataTypes) => {
       username: DataTypes.STRING,
       password: DataTypes.STRING,
       photo: DataTypes.STRING,
-      intro: DataTypes.TEXT,
+      intro: {
+        type: DataTypes.TEXT,
+        defaultValue: "請多多指教～",
+      },
     },
     {
       sequelize,

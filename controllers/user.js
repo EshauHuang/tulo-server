@@ -28,7 +28,7 @@ const userController = {
         nickname,
       });
       if (!newUser) throw new Error("FAIL");
-      const { id } = newUser;
+      const { id, intro } = newUser;
       const accessToken = createAccessToken(newUser);
       setAccessToken(req, res, accessToken);
       res.json({
@@ -37,6 +37,7 @@ const userController = {
           UserId: id,
           username,
           nickname,
+          intro,
         },
       });
     } catch (err) {
