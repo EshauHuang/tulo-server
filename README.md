@@ -7,7 +7,7 @@
 * Sequelize
 * multer
 * dotenv
-* JWT
+* jsonwebtoken
 * bcrypt
 
 ## 如何執行
@@ -30,9 +30,13 @@ PORT= // 此 server 要開在哪個 port
 SALT= // 網站使用者密碼加鹽
 ```
 
+### 建立資料庫欄位
+
+`npm run create`
+
 ### 執行 server 
 
-`nodemon index.js` 或 `node index.js`
+`npm run start`
 
 ## 目錄結構說明
 
