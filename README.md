@@ -20,6 +20,16 @@
 
 將 `.env.example` 修改成 `.env`，並輸入環境資料
 
+```
+DB_USERNAME= // 資料庫使用者
+DB_PASSWORD= // 資料庫密碼
+DB_DATABASE= // 資料庫名稱
+DB_PORT= // 資料庫在那個 port
+ACCESS_TOKEN_SECRET= // 驗證 JWT 的通行碼
+PORT= // 此 server 要開在哪個 port
+SALT= // 網站使用者密碼加鹽
+```
+
 ### 執行 server 
 
 `nodemon index.js` 或 `node index.js`
