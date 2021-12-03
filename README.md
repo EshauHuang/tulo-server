@@ -1,9 +1,57 @@
-# final-project-server
+# Tulo 圖樂-後端
 
-#### 使用資料庫: posrgreSQL
+## 使用技術
 
-#### 資料結構: [GitMind](https://gitmind.com/app/doc/1874063411)
+* 資料庫：posrgreSQL
+* Express
+* Sequelize
+* multer
+* dotenv
+* JWT
+* bcrypt
 
-#### 專案規劃: [HackMD](https://hackmd.io/soCmbqS9SB661TJ0T126eg?both)
+## 如何執行
 
-#### 初步頁面規劃(未完成): [Figma](https://www.figma.com/file/9Qi62BUx0MiQQM2xxrHE3F/final-project?node-id=0%3A1)
+### 安裝專案所需套件
+
+`npm install`
+
+### 建置環境
+
+將 `.env.example` 修改成 `.env`，並輸入環境資料
+
+### 執行 server 
+
+`nodemon index.js` 或 `node index.js`
+
+## 目錄結構說明
+
+```
+├── config                      
+│   └── config.js
+├── controllers                      
+│   ├── art.js     
+│   ├── comic.js         
+│   ├── user.js         
+│   └── work.js   
+├── migrations 
+├── models                      
+│   ├── index.js                
+│   ├── art.js       
+│   ├── comic.js 
+│   ├── user.js
+|   └── work.js
+├── routes                      
+│   ├── art.js                
+│   ├── comic.js       
+│   ├── image.js 
+│   ├── user.js
+|   └── work.js
+├── .env
+├── .prettierrc.json
+├── index.js
+├── package-lock.json
+├── package.json
+├── README.md
+├── .gitignore
+```
