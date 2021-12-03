@@ -1,5 +1,7 @@
 ## Tulo 圖樂-後端
 
+此為 Tulo 圖樂網站的 API 
+
 ## 使用技術
 
 * 資料庫：posrgreSQL
